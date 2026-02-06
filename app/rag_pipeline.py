@@ -11,9 +11,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 
-# -----------------------------------
-# Configure Gemini (OFFICIAL SDK)
-# -----------------------------------
+
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
 
@@ -41,7 +39,7 @@ def ingest_pdfs(uploaded_files: List):
 
     chunks = splitter.split_documents(documents)
 
-    # ✅ LOCAL EMBEDDINGS (NO QUOTA / NO API)
+    
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
@@ -71,7 +69,6 @@ Question:
 {query}
 """
 
-    # ✅ THE ONLY MODEL THAT WORKS FOR YOU
     model = genai.GenerativeModel("gemini-2.5-flash")
     response = model.generate_content(prompt)
 
