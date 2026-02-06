@@ -6,11 +6,7 @@ from datetime import datetime
 
 
 def send_confirmation_email(to_email: str, booking_id: str, booking_state: dict):
-    """
-    Send booking confirmation email using SendGrid API.
-    Uses professional HTML and plain text versions.
-    """
-    
+        
     try:
         api_key = st.secrets.get("SENDGRID_API_KEY") or os.getenv("SENDGRID_API_KEY")
     except:
