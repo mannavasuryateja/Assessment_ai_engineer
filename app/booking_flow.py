@@ -30,7 +30,7 @@ def initialize_booking_state():
         "check_in": None,
         "check_out": None,
         "confirmed": False,
-        "current_field": None  # Track which field we're asking for
+        "current_field": None  
     }
 
 
@@ -60,7 +60,7 @@ def validate_email(value: str) -> tuple:
 def validate_phone(value: str) -> tuple:
     """Validate phone field. Returns (is_valid, error_message)"""
     value = value.strip()
-    # Remove common separators
+    
     phone_digits = re.sub(r"[\s\-\(\)\.+]", "", value)
     if not re.match(r"^\d{7,15}$", phone_digits):
         return False, "❌ Please enter a valid phone number (7-15 digits)."
@@ -164,11 +164,11 @@ def update_state_from_input(state: dict, user_input: str) -> tuple:
 
     state[current_field] = cleaned
 
-    # Special validation for checkout date
+    
     if current_field == "check_out":
         is_valid_range, error = validate_checkout_after_checkin(state)
         if not is_valid_range:
-            state[current_field] = None  # Reset invalid value
+            state[current_field] = None  
             return False, error, state
 
     return True, None, state
