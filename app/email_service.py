@@ -10,7 +10,7 @@ def send_confirmation_email(to_email: str, booking_id: str, booking_state: dict)
     Send booking confirmation email using SendGrid API.
     Uses professional HTML and plain text versions.
     """
-    # Get SendGrid API key from environment or Streamlit secrets
+    
     try:
         api_key = st.secrets.get("SENDGRID_API_KEY") or os.getenv("SENDGRID_API_KEY")
     except:
@@ -32,7 +32,7 @@ def send_confirmation_email(to_email: str, booking_id: str, booking_state: dict)
         st.warning(error_msg)
         return False
 
-    # Create HTML email content
+    
     check_in = datetime.strptime(booking_state['check_in'], '%Y-%m-%d')
     check_out = datetime.strptime(booking_state['check_out'], '%Y-%m-%d')
     nights = (check_out - check_in).days
@@ -114,10 +114,10 @@ The Hotel Management Team
     """
 
     try:
-        # Initialize SendGrid client
+        
         sg = SendGridAPIClient(api_key)
         
-        # Create email
+        
         message = Mail(
             from_email=from_email,
             to_emails=to_email,
@@ -126,10 +126,10 @@ The Hotel Management Team
             html_content=html_body
         )
         
-        # Send email
+        
         response = sg.send(message)
         
-        # Check response status (202 = accepted for delivery)
+        
         if response.status_code == 202:
             print(f"✅ Email sent successfully to {to_email}")
             st.success(f"✅ Confirmation email sent to {to_email}")
