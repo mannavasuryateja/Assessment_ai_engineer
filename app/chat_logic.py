@@ -18,7 +18,7 @@ def initialize_chat_state():
         "booking_active": False,
         "booking_state": None,
         "awaiting_confirmation": False,
-        "mode": "chat",  # "chat" or "booking"
+        "mode": "chat",  
     }
 
 
@@ -141,22 +141,18 @@ def handle_user_message(state: dict, user_input: str):
     - None   → let RAG handle
     """
 
-    # Always store user message
+    
     add_message(state, "user", user_input)
 
     user_lower = user_input.lower().strip()
 
-    # =====================================================
-    # GREETING DETECTION (greet the user when they greet first)
-    # =====================================================
+    
     if detect_greeting(user_input):
         greeting_response = generate_greeting_response()
         add_message(state, "assistant", greeting_response)
         return greeting_response
 
-    # =====================================================
-    # COMMAND PROCESSING (works at ANY stage)
-    # =====================================================
+    
     exit_cmd = detect_exit_command(user_input)
     
     if exit_cmd == "exit":
@@ -173,7 +169,7 @@ def handle_user_message(state: dict, user_input: str):
         if state["booking_active"]:
             response = "📚 Let me search the hotel documents for you..."
             add_message(state, "assistant", response)
-            return None  # Let RAG handle
+            return None  
         else:
             response = "📚 Let me search the hotel documents for you..."
             add_message(state, "assistant", response)
@@ -194,17 +190,13 @@ def handle_user_message(state: dict, user_input: str):
         add_message(state, "assistant", question)
         return question
 
-    # =====================================================
-    # ESCAPE HATCH: Questions during booking
-    # =====================================================
+   
     if state["booking_active"] and "?" in user_input:
         response = "🔍 Let me look that up from the hotel documents..."
         add_message(state, "assistant", response)
-        return None  # RAG will handle this
+        return None  
 
-    # =====================================================
-    # START BOOKING
-    # =====================================================
+    
     if not state["booking_active"]:
         intent = detect_intent(user_input)
 
@@ -219,17 +211,14 @@ def handle_user_message(state: dict, user_input: str):
             add_message(state, "assistant", response)
             return response
 
-        # Not booking intent → let RAG answer
+        
         return None
 
-    # =====================================================
-    # CONFIRMATION STAGE
-    # =====================================================
+    
     if state["awaiting_confirmation"]:
         if user_lower == "confirm":
             booking_id = save_booking_tool(state["booking_state"])
-            guest_email = state["booking_state"]["email"]  # Save email before clearing state
-
+            guest_email = state["booking_state"]["email"]  
             email_result = email_tool(
                 guest_email,
                 booking_id,
@@ -262,39 +251,37 @@ def handle_user_message(state: dict, user_input: str):
         add_message(state, "assistant", response)
         return response
 
-    # =====================================================
-    # COLLECT BOOKING DETAILS WITH VALIDATION
-    # =====================================================
+    
     current_field = state["booking_state"].get("current_field")
     
     if not current_field:
-        # No field to collect yet
+        
         question = next_question(state["booking_state"])
         add_message(state, "assistant", question)
         return question
 
-    # Validate the input for current field
+    
     is_valid, error_msg, state_updated = update_state_from_input(
         state["booking_state"], user_input
     )
 
     if not is_valid:
-        # Invalid input - show error and re-ask
+        
         response = f"{error_msg}\n\n🔄 Please try again."
         add_message(state, "assistant", response)
         return response
 
-    # Valid input - move to next field
+    
     missing = get_missing_fields(state["booking_state"])
     
     if missing:
-        # More fields needed
+        
         question = next_question(state["booking_state"])
         response = f"✅ Got it!\n\n{question}"
         add_message(state, "assistant", response)
         return response
 
-    # All fields collected - show summary
+   
     summary = booking_summary(state["booking_state"])
     state["awaiting_confirmation"] = True
     add_message(state, "assistant", summary)
